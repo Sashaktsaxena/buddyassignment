@@ -7,10 +7,57 @@ import { FileText, Download, Lock, Check, ChevronDown } from "lucide-react"
 import Header from "@/components/header"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
+interface Attachment {
+  name: string;
+  type: string;
+}
+
+interface Answer {
+  id: number;
+  author: string;
+  avatar: string;
+  rating: number;
+  reviewCount: number;
+  date: string;
+  content: string;
+  attachments: Attachment[];
+  price: number;
+}
+
+interface SimilarDocument {
+  id: number;
+  title: string;
+  wordCount: number;
+  pageCount: number;
+}
+
+interface Document {
+  id: number;
+  title: string;
+  documentType: string;
+  subjectArea: string;
+  academicLevel: string;
+  wordCount: number;
+  pageCount: number;
+  author: string;
+  date: string;
+  contentType: string;
+  language: string;
+  referenceList: boolean;
+  formatting: string;
+  content: string;
+  attachments: Attachment[];
+  answers?: Answer[];
+  similarDocuments?: SimilarDocument[];
+}
+
 export default function DocumentPage({ params }: { params: { id: string } }) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [isSignedIn, setIsSignedIn] = useState(false)
+  const [document, setDocument] = useState<Document | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   // Check if user is signed in from URL parameter or localStorage
   useEffect(() => {
@@ -22,10 +69,60 @@ export default function DocumentPage({ params }: { params: { id: string } }) {
     }
   }, [searchParams])
 
+  // Fetch document data from API
+  useEffect(() => {
+    const fetchDocument = async () => {
+      try {
+        setLoading(true)
+        const response = await fetch(`/api/documents/${params.id}`)
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch document')
+        }
+        
+        const data = await response.json()
+        setDocument(data)
+        setLoading(false)
+      } catch (err) {
+        setError('Error loading document. Please try again later.')
+        setLoading(false)
+        console.error('Error fetching document:', err)
+      }
+    }
+
+    fetchDocument()
+  }, [params.id])
+
   const handleSignIn = () => {
     localStorage.setItem("isSignedIn", "true")
     setIsSignedIn(true)
     router.push(`/document/${params.id}?signedIn=true`)
+  }
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading document...</p>
+        </div>
+      </main>
+    )
+  }
+
+  if (error || !document) {
+    return (
+      <main className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center bg-white p-8 rounded-lg shadow-sm max-w-md">
+          <FileText className="h-12 w-12 text-red-500 mx-auto mb-4" />
+          <h2 className="text-xl font-bold mb-2">Document Not Found</h2>
+          <p className="text-gray-600 mb-6">{error || "The requested document could not be found."}</p>
+          <Button onClick={() => router.push('/')}>
+            Return Home
+          </Button>
+        </div>
+      </main>
+    )
   }
 
   return (
@@ -36,16 +133,16 @@ export default function DocumentPage({ params }: { params: { id: string } }) {
           <Header />
           <div className="py-12">
             <h1 className="text-3xl md:text-4xl font-bold mb-4">
-              Lorem Ipsum Dolor Sit Amet Consectetur. Risus Augue Sit Vestibulum Convallis Vel Euismod.
+              {document.title}
             </h1>
             <div className="flex flex-wrap gap-4">
               <div className="flex items-center">
                 <span className="text-sm opacity-80">Document Type:</span>
-                <span className="text-sm ml-2">Thesis</span>
+                <span className="text-sm ml-2">{document.documentType}</span>
               </div>
               <div className="flex items-center">
                 <span className="text-sm opacity-80">Subject Area:</span>
-                <span className="text-sm ml-2">Management</span>
+                <span className="text-sm ml-2">{document.subjectArea}</span>
               </div>
             </div>
           </div>
@@ -57,7 +154,7 @@ export default function DocumentPage({ params }: { params: { id: string } }) {
           {/* Main Document Section */}
           <div className="md:col-span-2">
             <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-              <h2 className="text-lg font-semibold mb-4">Document 1</h2>
+              <h2 className="text-lg font-semibold mb-4">Document {document.id}</h2>
 
               {isSignedIn ? (
                 <>
@@ -76,154 +173,27 @@ export default function DocumentPage({ params }: { params: { id: string } }) {
 
                   {/* Full document content */}
                   <div className="prose max-w-none text-sm">
-                    <p>
-                    Lorem ipsum dolor sit amet consectetur. Mi sapien egestas risus a amet futurum et malesuada.
-                      Mattis fermentum turpis id placerat sed condimentum nunc sed ut. Sollicitudan diam augue. Egestas
-                      nunc sed nunc. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed
-                      ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc
-                      sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed
-                      nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut.
-                      Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed
-                      ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc
-                      sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed
-                      nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut.
-                      Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed
-                      ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc
-                      sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed
-                      nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut.
-                      Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed
-                      ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc
-                      sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed
-                      nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut.
-                      Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed
-                      ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc
-                      sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed
-                      nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut.
-                      Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed
-                      ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc
-                      sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed
-                      nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut.
-                      Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed
-                      ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc
-                      sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed
-                      nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut.
-                      Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed
-                      ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc
-                      sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed
-                      nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut.
-                      Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed
-                      ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc
-                      sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed
-                      nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut.
-                      Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed
-                      ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc
-                      sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed
-                      nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut.
-                      Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed
-                      ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc
-                      sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed
-                      nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut.
-                      Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed
-                      ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc
-                      sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed
-                      nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut.
-                      Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed
-                      ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc
-                      sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed
-                      nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut.
-                      Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed
-                      ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc
-                      sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed
-                      nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut.
-                      Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed
-                      ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc
-                      sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed
-                    </p>
+                    <p>{document.content}</p>
                   </div>
 
                   {/* Document attachments */}
-                  <div className="flex gap-4 mt-6">
-                    <div className="flex items-center text-xs text-purple-600 bg-purple-50 px-3 py-2 rounded-md">
-                      <FileText className="h-4 w-4 mr-1" />
-                      <span>project_instruction.pdf</span>
+                  {document.attachments && document.attachments.length > 0 && (
+                    <div className="flex gap-4 mt-6">
+                      {document.attachments.map((attachment, index) => (
+                        <div key={index} className="flex items-center text-xs text-purple-600 bg-purple-50 px-3 py-2 rounded-md">
+                          <FileText className="h-4 w-4 mr-1" />
+                          <span>{attachment.name}</span>
+                        </div>
+                      ))}
                     </div>
-                    <div className="flex items-center text-xs text-purple-600 bg-purple-50 px-3 py-2 rounded-md">
-                      <FileText className="h-4 w-4 mr-1" />
-                      <span>document.docx</span>
-                    </div>
-                  </div>
+                  )}
                 </>
               ) : (
                 <div className="relative">
                   {/* Blurred document with overlay */}
                   <div className="blur-sm opacity-100 pointer-events-none">
                     <div className="prose max-w-none text-sm">
-                    <p>
-                      Lorem ipsum dolor sit amet consectetur. Mi sapien egestas risus a amet futurum et malesuada.
-                      Mattis fermentum turpis id placerat sed condimentum nunc sed ut. Sollicitudan diam augue. Egestas
-                      nunc sed nunc. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed
-                      ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc
-                      sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed
-                      nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut.
-                      Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed
-                      ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc
-                      sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed
-                      nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut.
-                      Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed
-                      ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc
-                      sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed
-                      nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut.
-                      Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed
-                      ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc
-                      sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed
-                      nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut.
-                      Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed
-                      ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc
-                      sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed
-                      nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut.
-                      Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed
-                      ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc
-                      sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed
-                      nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut.
-                      Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed
-                      ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc
-                      sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed
-                      nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut.
-                      Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed
-                      ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc
-                      sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed
-                      nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut.
-                      Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed
-                      ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc
-                      sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed
-                      nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut.
-                      Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed
-                      ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc
-                      sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed
-                      nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut.
-                      Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed
-                      ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc
-                      sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed
-                      nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut.
-                      Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed
-                      ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc
-                      sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed
-                      nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut.
-                      Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed
-                      ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc
-                      sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed
-                      nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut.
-                      Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed
-                      ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc
-                      sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed
-                      nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut.
-                      Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed
-                      ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc
-                      sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed nunc sed ut. Sed
-
-       
-  
-                    </p>
+                      <p>{document.content}</p>
                     </div>
                   </div>
 
@@ -237,8 +207,7 @@ export default function DocumentPage({ params }: { params: { id: string } }) {
                       </div>
                       <h3 className="text-xl font-bold mb-2">Sign Up To View The Full Document!</h3>
                       <p className="text-gray-500 text-sm mb-6">
-                        Lorem ipsum dolor sit amet consectetur adipiscing elit. Nulla nunc feugiat Studio nulla ut ipsum
-                        vestibulum leo vivamus aget a commodo.
+                        Get full access to this document and thousands more. Sign up to view the complete content.
                       </p>
                       <Button className="w-full bg-purple-600 hover:bg-purple-700" onClick={handleSignIn}>
                         <Lock className="h-4 w-4 mr-2" /> Sign Up
@@ -249,141 +218,93 @@ export default function DocumentPage({ params }: { params: { id: string } }) {
               )}
             </div>
 
-            {isSignedIn && (
+            {isSignedIn && document.answers && document.answers.length > 0 && (
               <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-semibold">Answer (2)</h2>
+                  <h2 className="text-lg font-semibold">Answer ({document.answers.length})</h2>
                   <ChevronDown className="h-5 w-5" />
                 </div>
 
-                {/* Answer 1 */}
-                <div className="mb-6">
-                  <div className="flex items-start gap-3 mb-3">
-                    <Avatar>
-                      <AvatarImage src="/placeholder.svg" />
-                      <AvatarFallback>CS</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <div className="flex items-center">
-                        <h4 className="font-medium">Corey Stanton</h4>
-                        <div className="flex items-center ml-2">
-                          <span className="text-yellow-500 text-xs">★</span>
-                          <span className="text-xs ml-1">4.9 (98)</span>
+                {document.answers.map((answer) => (
+                  <div key={answer.id} className="mb-6">
+                    <div className="flex items-start gap-3 mb-3">
+                      <Avatar>
+                        <AvatarImage src={answer.avatar} />
+                        <AvatarFallback>{answer.author.substring(0, 2)}</AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <div className="flex items-center">
+                          <h4 className="font-medium">{answer.author}</h4>
+                          <div className="flex items-center ml-2">
+                            <span className="text-yellow-500 text-xs">★</span>
+                            <span className="text-xs ml-1">{answer.rating} ({answer.reviewCount})</span>
+                          </div>
                         </div>
-                      </div>
-                      <p className="text-xs text-gray-500">5 days ago</p>
-                    </div>
-                  </div>
-
-                  <div className="ml-10">
-                    <div className="bg-gray-50 p-4 rounded-lg mb-3">
-                      <p className="text-sm text-gray-600">
-                        Lorem ipsum dolor sit amet consectetur adipiscing elit. Nulla nunc feugiat Studio nulla ut ipsum
-                        vestibulum leo vivamus aget a commodo. Lorem ipsum dolor sit amet consectetur adipiscing elit.
-                        Nulla nunc feugiat Studio nulla ut ipsum vestibulum leo vivamus aget a commodo.
-                      </p>
-                    </div>
-
-                    <div className="flex gap-3 mb-4">
-                      <div className="flex items-center text-xs text-purple-600 bg-purple-50 px-3 py-2 rounded-md">
-                        <FileText className="h-4 w-4 mr-1" />
-                        <span>project_instruction.pdf</span>
-                      </div>
-                      <div className="flex items-center text-xs text-purple-600 bg-purple-50 px-3 py-2 rounded-md">
-                        <FileText className="h-4 w-4 mr-1" />
-                        <span>document.docx</span>
+                        <p className="text-xs text-gray-500">{answer.date}</p>
                       </div>
                     </div>
 
-                    <div className="flex gap-3">
-                      <Button variant="secondary" className="bg-purple-600 text-white hover:bg-purple-700 text-xs">
-                        Plagiarism Check
-                      </Button>
-                      <Button variant="outline" className="text-xs">
-                        Purchase $50
-                      </Button>
-                    </div>
-                  </div>
-                </div>
+                    <div className="ml-10">
+                      <div className="bg-gray-50 p-4 rounded-lg mb-3">
+                        <p className="text-sm text-gray-600">{answer.content}</p>
+                      </div>
 
-                {/* Answer 2 */}
-                <div>
-                  <div className="flex items-start gap-3 mb-3">
-                    <Avatar>
-                      <AvatarImage src="/placeholder.svg" />
-                      <AvatarFallback>KS</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <div className="flex items-center">
-                        <h4 className="font-medium">Kierra Septimus</h4>
-                        <div className="flex items-center ml-2">
-                          <span className="text-yellow-500 text-xs">★</span>
-                          <span className="text-xs ml-1">4.8 (65)</span>
+                      {answer.attachments && answer.attachments.length > 0 && (
+                        <div className="flex gap-3 mb-4">
+                          {answer.attachments.map((attachment, index) => (
+                            <div key={index} className="flex items-center text-xs text-purple-600 bg-purple-50 px-3 py-2 rounded-md">
+                              <FileText className="h-4 w-4 mr-1" />
+                              <span>{attachment.name}</span>
+                            </div>
+                          ))}
                         </div>
-                      </div>
-                      <p className="text-xs text-gray-500">3 days ago</p>
-                    </div>
-                  </div>
+                      )}
 
-                  <div className="ml-10">
-                    <div className="bg-gray-50 p-4 rounded-lg mb-3">
-                      <p className="text-sm text-gray-600">
-                        Lorem ipsum dolor sit amet consectetur adipiscing elit. Nulla nunc feugiat Studio nulla ut ipsum
-                        vestibulum leo vivamus aget a commodo. Lorem ipsum dolor sit amet consectetur adipiscing elit.
-                        Nulla nunc feugiat Studio nulla ut ipsum vestibulum leo vivamus aget a commodo.
-                      </p>
-                    </div>
-
-                    <div className="flex gap-3 mb-4">
-                      <div className="flex items-center text-xs text-purple-600 bg-purple-50 px-3 py-2 rounded-md">
-                        <FileText className="h-4 w-4 mr-1" />
-                        <span>project_instruction.pdf</span>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-3">
-                      <Button variant="secondary" className="bg-purple-600 text-white hover:bg-purple-700 text-xs">
-                        Plagiarism Check
-                      </Button>
-                      <Button variant="outline" className="text-xs">
-                        Purchase $50
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Similar Documents */}
-            <div>
-              <div className="flex items-center mb-6">
-                <div className="crown-icon mr-2"></div>
-                <h2 className="text-xl font-bold">Similar Documents</h2>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 ">
-                {[1, 2, 3].map((item) => (
-                  <div key={item} className="bg-white rounded-lg shadow-sm p-4 ">
-                    <h3 className="font-bold mb-2">Lorem ipsum dolor sit amet consectetur.</h3>
-                    <p className="text-sm text-gray-600 mb-4 line-clamp-3 blur-sm opacity-100 pointer-events-none">
-                      Lorem ipsum dolor sit amet consectetur. Morbi integer tempus odio ut fusce pulvinar. Purus in eget
-                      vitae posuere laoreet nec. Maecenas tincidunt aliquot pretium eu ornare. At ultricies porttitor
-                      mauris sem. Mauris leo venenatis.
-                    </p>
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center text-purple-600">
-                        <FileText className="h-4 w-4 mr-1" />
-                        <span className="text-xs">Words: 514</span>
-                      </div>
-                      <div className="flex items-center text-purple-600">
-                        <FileText className="h-4 w-4 mr-1" />
-                        <span className="text-xs">Pages: 02</span>
+                      <div className="flex gap-3">
+                        <Button variant="secondary" className="bg-purple-600 text-white hover:bg-purple-700 text-xs">
+                          Plagiarism Check
+                        </Button>
+                        <Button variant="outline" className="text-xs">
+                          Purchase ${answer.price}
+                        </Button>
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
-            </div>
+            )}
+
+            {/* Similar Documents */}
+            {document.similarDocuments && document.similarDocuments.length > 0 && (
+              <div>
+                <div className="flex items-center mb-6">
+                  <div className="crown-icon mr-2"></div>
+                  <h2 className="text-xl font-bold">Similar Documents</h2>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {document.similarDocuments.map((item) => (
+                    <div key={item.id} className="bg-white rounded-lg shadow-sm p-4">
+                      <h3 className="font-bold mb-2">{item.title}</h3>
+                      <p className="text-sm text-gray-600 mb-4 line-clamp-3 blur-sm opacity-100 pointer-events-none">
+                        Lorem ipsum dolor sit amet consectetur. Morbi integer tempus odio ut fusce pulvinar. Purus in eget
+                        vitae posuere laoreet nec. Maecenas tincidunt aliquot pretium eu ornare.
+                      </p>
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center text-purple-600">
+                          <FileText className="h-4 w-4 mr-1" />
+                          <span className="text-xs">Words: {item.wordCount}</span>
+                        </div>
+                        <div className="flex items-center text-purple-600">
+                          <FileText className="h-4 w-4 mr-1" />
+                          <span className="text-xs">Pages: {item.pageCount}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Sidebar */}
@@ -413,40 +334,40 @@ export default function DocumentPage({ params }: { params: { id: string } }) {
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-500">Content Type:</span>
-                  <span className="text-sm">User generated</span>
+                  <span className="text-sm">{document.contentType}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-500">Words:</span>
-                  <span className="text-sm">514</span>
+                  <span className="text-sm">{document.wordCount}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-500">Pages:</span>
-                  <span className="text-sm">2</span>
+                  <span className="text-sm">{document.pageCount}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-500">Level:</span>
-                  <span className="text-sm">High School</span>
+                  <span className="text-sm">{document.academicLevel}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-500">Language:</span>
-                  <span className="text-sm">English</span>
+                  <span className="text-sm">{document.language}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-500">Reference List:</span>
-                  <span className="text-sm">Yes</span>
+                  <span className="text-sm">{document.referenceList ? "Yes" : "No"}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-500">Formatting:</span>
-                  <span className="text-sm">AMA</span>
+                  <span className="text-sm">{document.formatting}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-500">Uploaded by:</span>
-                  <span className="text-sm">Brandon Vetrovs</span>
+                  <span className="text-sm">{document.author}</span>
                 </div>
                 {isSignedIn && (
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-500">Date:</span>
-                    <span className="text-sm">18/10/2021</span>
+                    <span className="text-sm">{new Date(document.date).toLocaleDateString()}</span>
                   </div>
                 )}
               </div>
