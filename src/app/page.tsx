@@ -51,7 +51,7 @@ export default function Home() {
             </div>
             <div className="md:w-1/2 flex justify-end">
               <Image
-                src="/placeholder.svg?height=400&width=500"
+                src="/assets/images/image1.png"
                 width={500}
                 height={400}
                 alt="Students studying together"
