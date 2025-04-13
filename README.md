@@ -33,8 +33,8 @@ This is a [Next.js](https://nextjs.org/) project that provides assignment manage
 - **Version Control**: Git
 - **API Handling**: Next.js API routes
 - **Forms**: React Hook Form
-- **Authentication**: (Include if used, e.g., NextAuth.js, Auth0, etc.)
-- **Data Fetching**: Next.js built-in data fetching methods (getStaticProps, getServerSideProps)
+- **Authentication**: clicking on the signin button and signout is clicking on signout 
+
 
 ## Getting Started
 
