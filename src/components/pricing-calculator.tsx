@@ -31,7 +31,7 @@ export default function PricingCalculator() {
             <SelectContent>
               <SelectItem value="high-school">High School</SelectItem>
               <SelectItem value="undergraduate">Undergraduate/Bachelor</SelectItem>
-              <SelectItem value="masters">Master's</SelectItem>
+              <SelectItem value="masters">Master&apos;s</SelectItem>
               <SelectItem value="phd">PhD</SelectItem>
             </SelectContent>
           </Select>

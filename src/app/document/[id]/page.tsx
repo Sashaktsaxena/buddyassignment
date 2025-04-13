@@ -1,5 +1,5 @@
 "use client"
-
+import React from "react"
 import { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -51,13 +51,21 @@ interface Document {
   similarDocuments?: SimilarDocument[];
 }
 
-export default function DocumentPage({ params }: { params: { id: string } }) {
+// Fix: Update the params type to match Next.js requirements
+interface DocumentPageProps {
+  params: Promise<{ id: string }>;
+}
+export default function DocumentPage({ params }: DocumentPageProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [isSignedIn, setIsSignedIn] = useState(false)
   const [document, setDocument] = useState<Document | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  
+  // Unwrap the params Promise
+  const unwrappedParams = React.use(params)
+  const documentId = unwrappedParams.id
 
   // Check if user is signed in from URL parameter or localStorage
   useEffect(() => {
@@ -72,9 +80,11 @@ export default function DocumentPage({ params }: { params: { id: string } }) {
   // Fetch document data from API
   useEffect(() => {
     const fetchDocument = async () => {
+      if (!documentId) return;
+      
       try {
         setLoading(true)
-        const response = await fetch(`/api/documents/${params.id}`)
+        const response = await fetch(`/api/documents/${documentId}`)
         
         if (!response.ok) {
           throw new Error('Failed to fetch document')
@@ -91,12 +101,12 @@ export default function DocumentPage({ params }: { params: { id: string } }) {
     }
 
     fetchDocument()
-  }, [params.id])
+  }, [documentId])
 
   const handleSignIn = () => {
     localStorage.setItem("isSignedIn", "true")
     setIsSignedIn(true)
-    router.push(`/document/${params.id}?signedIn=true`)
+    router.push(`/document/${documentId}?signedIn=true`)
   }
 
   if (loading) {
@@ -148,7 +158,6 @@ export default function DocumentPage({ params }: { params: { id: string } }) {
           </div>
         </div>
       </div>
-
       <div className="container mx-auto px-4 md:px-6 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Main Document Section */}

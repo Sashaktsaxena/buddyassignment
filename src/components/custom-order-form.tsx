@@ -6,7 +6,7 @@ import { Minus, Plus } from "lucide-react"
 export default function CustomOrderForm() {
   return (
     <div className="buddy-gradient rounded-xl p-6 text-white max-w-3xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Can't find the right project for you? Place a custom order right now!</h2>
+      <h2 className="text-2xl font-bold mb-4">Can&apos;t find the right project for you? Place a custom order right now!</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <div>
@@ -33,7 +33,7 @@ export default function CustomOrderForm() {
             <SelectContent>
               <SelectItem value="high-school">High School</SelectItem>
               <SelectItem value="undergraduate">Undergraduate</SelectItem>
-              <SelectItem value="masters">Master's</SelectItem>
+              <SelectItem value="masters">Master&apos;s</SelectItem>
               <SelectItem value="phd">PhD</SelectItem>
             </SelectContent>
           </Select>

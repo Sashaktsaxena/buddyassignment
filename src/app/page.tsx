@@ -37,7 +37,8 @@ interface AcademicLevel {
 }
 
 export default function Home() {
-  const [isSignedIn, setIsSignedIn] = useState(false)
+  // Changed to useState but actually using it in the Header component below
+
   const [documents, setDocuments] = useState<Document[]>([])
   const [documentTypes, setDocumentTypes] = useState<DocumentType[]>([])
   const [subjects, setSubjects] = useState<string[]>([])
@@ -53,8 +54,8 @@ export default function Home() {
 
   // Check if user is signed in
   useEffect(() => {
-    const signedIn = localStorage.getItem("isSignedIn") === "true"
-    setIsSignedIn(signedIn)
+
+
   }, [])
 
   // Fetch documents
@@ -216,10 +217,6 @@ export default function Home() {
                   {documents.slice(0, 4).map((doc) => (
                     <Link href={`/document/${doc.id}`} key={doc.id}>
                       <DocumentCard 
-                        title={doc.title}
-                        documentType={doc.documentType}
-                        wordCount={doc.wordCount}
-                        pageCount={doc.pageCount}
                       />
                     </Link>
                   ))}
