@@ -286,7 +286,7 @@ export default function DocumentPage({ params }: { params: { id: string } }) {
                   {document.similarDocuments.map((item) => (
                     <div key={item.id} className="bg-white rounded-lg shadow-sm p-4">
                       <h3 className="font-bold mb-2">{item.title}</h3>
-                      <p className="text-sm text-gray-600 mb-4 line-clamp-3 blur-sm opacity-100 pointer-events-none">
+                      <p className="text-sm text-gray-600 mb-4 line-clamp-3">
                         Lorem ipsum dolor sit amet consectetur. Morbi integer tempus odio ut fusce pulvinar. Purus in eget
                         vitae posuere laoreet nec. Maecenas tincidunt aliquot pretium eu ornare.
                       </p>
